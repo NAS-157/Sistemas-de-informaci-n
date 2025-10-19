@@ -1,0 +1,63 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+/* Variables de tema: claro por defecto, .dark sobrescribe */
+:root {
+  --bg: #ffffff;
+  --accent: #2196f3; /* celeste */
+  --accent-light: #b3e0fc;
+  --text: #2196f3; /* texto en modo claro sigue siendo celeste como antes */
+  --on-accent: #ffffff;
+  --row-odd: #f8fbfd;
+  --row-even: #ffffff;
+}
+
+.dark {
+  --bg: #000000;
+  --accent: #ff9800; /* naranja en modo oscuro */
+  --accent-light: #ffb74d;
+  --text: #ffffff; /* las letras se mantienen blancas en modo oscuro */
+  --on-accent: #ffffff;
+  --row-odd: #0b0b0b;
+  --row-even: #000000;
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
