@@ -52,6 +52,11 @@ db.run(createServiciosBorradosTable, (err) => {
   }
 });
 
+// Asegurar columna fecha_borrado en servicios_borrados
+db.run("ALTER TABLE servicios_borrados ADD COLUMN fecha_borrado TEXT", (err) => {
+  // Si ya existe la columna, sqlite lanzará un error que ignoramos
+});
+
 // Simulación de base de datos en memoria
 let productos = [
   { id: 1, nombre: "Cable eléctrico", stock: 50 },
@@ -174,49 +179,46 @@ app.patch("/servicios/:id/estado", (req, res) => {
 });
 
 // Consultar un servicio específico (desde la base de datos)
-app.get("/servicios/:id", (req, res) => {
+app.get('/servicios/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  db.get("SELECT * FROM servicios WHERE id = ?", [id], (err, row) => {
-    if (err || !row) {
-      return res.status(404).json({ error: "Servicio no encontrado" });
-    }
+  if (isNaN(id)) return res.status(400).json({ error: 'ID inválida' });
+  db.get('SELECT * FROM servicios WHERE id = ?', [id], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row) return res.status(404).json({ error: 'Servicio no encontrado' });
     res.json(row);
   });
 });
 
-// Eliminar un servicio (mover a servicios_borrados y luego borrar)
-app.delete("/servicios/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const motivo = req.query.motivo; // expected: 'cancelado' or 'terminado'
-  db.get("SELECT * FROM servicios WHERE id = ?", [id], (err, row) => {
-    if (err || !row) {
-      return res.status(404).json({ error: "Servicio no encontrado" });
-    }
-    // Insertar en servicios_borrados. Si se envía motivo, lo usamos como estado final (p.ej. 'cancelado' o 'terminado')
-    const estadoFinal = motivo || row.estado;
-    const sqlInsert = `INSERT INTO servicios_borrados (id_original, tipo, descripcion, estado, fechaIngreso, fechaEntrega) VALUES (?, ?, ?, ?, ?, ?)`;
-    db.run(sqlInsert, [row.id, row.tipo, row.descripcion, estadoFinal, row.fechaIngreso, row.fechaEntrega], function (err) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      // Borrar de servicios
-      db.run("DELETE FROM servicios WHERE id = ?", [id], function (err) {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        }
-        res.json({ ...row, id_borrado: this.lastID, motivo: estadoFinal });
-      });
-    });
-  });
-});
+// Endpoint de informes: CSV de servicios filtrable por fecha y estado
+// Parámetros: desde (YYYY-MM-DD), hasta (YYYY-MM-DD), estado (texto), preview=true (devuelve JSON en vez de CSV)
+// Endpoint de informes: CSV de servicios borrados en los últimos 30 días (filtrable por fecha original y estado)
+// Parámetros: desde (YYYY-MM-DD), hasta (YYYY-MM-DD), estado (texto), preview=true (devuelve JSON en vez de CSV)
+app.get('/informes/servicios', (req, res) => {
+  const { desde, hasta, estado, preview } = req.query;
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  let sql = 'SELECT id_borrado, id_original, tipo, descripcion, estado, fechaIngreso, fechaEntrega, fecha_borrado FROM servicios_borrados WHERE fecha_borrado >= ?';
+  const params = [thirtyDaysAgo];
+  if (desde) { sql += ' AND fechaIngreso >= ?'; params.push(desde); }
+  if (hasta) { sql += ' AND fechaIngreso <= ?'; params.push(hasta); }
+  if (estado) { sql += ' AND estado = ?'; params.push(estado); }
+  sql += ' ORDER BY fecha_borrado DESC';
 
-// Obtener todos los servicios borrados
-app.get("/servicios-borrados", (req, res) => {
-  db.all("SELECT * FROM servicios_borrados", [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+  db.all(sql, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (preview === 'true') return res.json(rows);
+    // Generar CSV con marcación de borrado
+    const headers = ['id_borrado','id_original','tipo','descripcion','estado','fechaIngreso','fechaEntrega','fecha_borrado'];
+    const escape = (v) => (v == null ? '' : '"' + String(v).replace(/"/g,'""') + '"');
+    const lines = [headers.join(',')];
+    for (const r of rows) {
+      const row = [r.id_borrado, r.id_original, r.tipo, r.descripcion, r.estado, r.fechaIngreso, r.fechaEntrega, r.fecha_borrado].map(escape).join(',');
+      lines.push(row);
     }
-    res.json(rows);
+    const csv = lines.join('\n');
+    const filename = `servicios_borrados_${new Date().toISOString().slice(0,10)}.csv`;
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csv);
   });
 });
 
@@ -250,6 +252,11 @@ CREATE TABLE IF NOT EXISTS cotizaciones_borradas (
 `;
 db.run(createCotizacionesBorradasTable, (err) => {
   if (err) console.error("Error creando tabla cotizaciones_borradas:", err.message);
+});
+
+// Asegurar columna fecha_borrado en cotizaciones_borradas
+db.run("ALTER TABLE cotizaciones_borradas ADD COLUMN fecha_borrado TEXT", (err) => {
+  // Ignorar errores por columna existente
 });
 
 // Listar cotizaciones
@@ -287,7 +294,9 @@ app.patch('/cotizaciones/:id/estado', (req, res) => {
     db.get('SELECT * FROM cotizaciones WHERE id = ?', [id], (err, row) => {
       if (err || !row) return res.status(404).json({ error: 'Cotización no encontrada' });
       const sqlInsert = 'INSERT INTO cotizaciones_borradas (id_original, cliente, items, total, estado, fecha) VALUES (?, ?, ?, ?, ?, ?)';
-      db.run(sqlInsert, [row.id, row.cliente, row.items, row.total, 'rechazada', row.fecha], function(err) {
+      const fechaBorrado = new Date().toISOString();
+      const sqlInsertWithFecha = 'INSERT INTO cotizaciones_borradas (id_original, cliente, items, total, estado, fecha, fecha_borrado) VALUES (?, ?, ?, ?, ?, ?, ?)';
+      db.run(sqlInsertWithFecha, [row.id, row.cliente, row.items, row.total, 'rechazada', row.fecha, fechaBorrado], function(err) {
         if (err) return res.status(500).json({ error: err.message });
         db.run('DELETE FROM cotizaciones WHERE id = ?', [id], function(err) {
           if (err) return res.status(500).json({ error: err.message });
@@ -323,25 +332,82 @@ app.get('/cotizaciones-borradas', (req, res) => {
   });
 });
 
+// Endpoint de informes para cotizaciones: incluye cotizaciones activas y cotizaciones borradas en los últimos 30 días
+// Parámetros: desde, hasta (filtrado por fecha original), estado, preview=true
+app.get('/informes/cotizaciones', (req, res) => {
+  const { desde, hasta, estado, preview } = req.query;
+  // Primero obtenemos cotizaciones activas (tabla cotizaciones)
+  const where = [];
+  const params = [];
+  if (desde) { where.push('fecha >= ?'); params.push(desde); }
+  if (hasta) { where.push('fecha <= ?'); params.push(hasta); }
+  if (estado) { where.push('estado = ?'); params.push(estado); }
+  let sqlActive = 'SELECT id, cliente, items, total, estado, fecha, NULL as fecha_borrado, 0 as borrada FROM cotizaciones';
+  if (where.length) sqlActive += ' WHERE ' + where.join(' AND ');
+
+  db.all(sqlActive, params, (err, activeRows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    // Luego obtenemos cotizaciones_borradas de los últimos 30 días
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    let sqlBorr = 'SELECT id_borrado, id_original, cliente, items, total, estado, fecha, fecha_borrado FROM cotizaciones_borradas WHERE fecha_borrado >= ?';
+    const bparams = [thirtyDaysAgo];
+    if (desde) { sqlBorr += ' AND fecha >= ?'; bparams.push(desde); }
+    if (hasta) { sqlBorr += ' AND fecha <= ?'; bparams.push(hasta); }
+    if (estado) { sqlBorr += ' AND estado = ?'; bparams.push(estado); }
+    db.all(sqlBorr, bparams, (err, borrRows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      // Normalizar borrRows to have same shape as activeRows
+      const normalizedBorr = borrRows.map(r => ({ id: r.id_original, cliente: r.cliente, items: JSON.parse(r.items), total: r.total, estado: r.estado, fecha: r.fecha, fecha_borrado: r.fecha_borrado, borrada: 1 }));
+      const normalizedActive = activeRows.map(r => ({ id: r.id, cliente: r.cliente, items: JSON.parse(r.items), total: r.total, estado: r.estado, fecha: r.fecha, fecha_borrado: null, borrada: 0 }));
+      // Añadir representación legible de items: "descripcion: $precio, ..."
+      const formatItems = (items) => {
+        try {
+          if (!items) return '';
+          // items expected to be array of { descripcion, precio } or similar
+          if (Array.isArray(items)) return items.map(it => `${it.descripcion}: $${it.precio}`).join(', ');
+          // if items is an object/string, try to handle gracefully
+          if (typeof items === 'string') {
+            const parsed = JSON.parse(items);
+            if (Array.isArray(parsed)) return parsed.map(it => `${it.descripcion}: $${it.precio}`).join(', ');
+          }
+          return '';
+        } catch(e) {
+          return '';
+        }
+      };
+      // attach items_formatted
+      for (const r of normalizedBorr) r.items_formatted = formatItems(r.items);
+      for (const r of normalizedActive) r.items_formatted = formatItems(r.items);
+      const combined = [...normalizedActive, ...normalizedBorr];
+      if (preview === 'true') return res.json(combined);
+      // Generar CSV
+      const headers = ['id','cliente','items_formatted','total','estado','fecha','fecha_borrado','borrada'];
+      const escape = (v) => {
+        if (v == null) return '';
+        const s = typeof v === 'string' ? v.replace(/"/g, '""') : String(v);
+        return '"' + s + '"';
+      };
+      const lines = [headers.join(',')];
+      for (const r of combined) {
+        const itemsStr = (r.items_formatted || '').replace(/"/g,'""');
+        const row = [r.id, r.cliente, itemsStr, r.total, r.estado, r.fecha, r.fecha_borrado || '', r.borrada].map(escape).join(',');
+        lines.push(row);
+      }
+      const csv = lines.join('\n');
+      const filename = `cotizaciones_${new Date().toISOString().slice(0,10)}.csv`;
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(csv);
+    });
+  });
+});
+
 // Eliminar definitivamente una cotización borrada
 app.delete('/cotizaciones-borradas/:id_borrado', (req, res) => {
   const id_borrado = parseInt(req.params.id_borrado);
   db.get('SELECT * FROM cotizaciones_borradas WHERE id_borrado = ?', [id_borrado], (err, row) => {
     if (err || !row) return res.status(404).json({ error: 'Cotización borrada no encontrada' });
     db.run('DELETE FROM cotizaciones_borradas WHERE id_borrado = ?', [id_borrado], function(err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ eliminado: true, ...row });
-    });
-  });
-});
-
-// Eliminar una cotización (solo si está aceptada)
-app.delete('/cotizaciones/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  db.get('SELECT * FROM cotizaciones WHERE id = ?', [id], (err, row) => {
-    if (err || !row) return res.status(404).json({ error: 'Cotización no encontrada' });
-    if (row.estado !== 'aceptada') return res.status(400).json({ error: 'Solo se pueden eliminar cotizaciones aceptadas' });
-    db.run('DELETE FROM cotizaciones WHERE id = ?', [id], function(err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ eliminado: true, ...row });
     });

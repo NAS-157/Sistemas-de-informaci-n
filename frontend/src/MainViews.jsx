@@ -5,6 +5,7 @@ import ServiciosList from './ServiciosList';
 import ServiciosBorrados from './ServiciosBorrados';
 import Navigation from './Navigation';
 import CotizacionesBorradas from './CotizacionesBorradas';
+import Informes from './Informes';
 
 function MainViews() {
   const [view, setView] = useState('cotizaciones');
@@ -30,6 +31,12 @@ function MainViews() {
         <div>
           <ServiciosBorrados />
           <CotizacionesBorradas />
+        </div>
+      )}
+
+      {view === 'informes' && (
+        <div>
+          <Informes />
         </div>
       )}
     </div>

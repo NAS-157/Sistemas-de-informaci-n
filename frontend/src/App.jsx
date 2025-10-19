@@ -30,7 +30,7 @@ function App() {
       }}
     >
       <div style={{ width: "100%", maxWidth: 900, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-  <h1 style={{ color: "#2196f3", textAlign: "center" }}>SEVEN ELECTRIC</h1>
+  <h1 style={{ color: "#2196f3", textAlign: "center" }}>SEVEN ELECTRIC - GESTOR DE SERVICIOS</h1>
   <MainViews />
       </div>
     </div>
