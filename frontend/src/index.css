@@ -1,11 +1,22 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Font stack: Montserrat first, then system fallbacks */
+  font-family: 'Montserrat', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  /* Tema claro por defecto */
-  color: #213547;
-  background-color: #ffffff;
+  /* Dark theme variables */
+  --bg: #0f172a; /* azul grisáceo oscuro */
+  --text: #f8fafc; /* casi blanco */
+  --muted: #f1f5f9;
+  --button-bg: #38bdf8; /* celeste suave */
+  --button-text: #0f172a;
+  --input-bg: #1e293b;
+  --input-border: #334155;
+  --card-bg: rgba(255,255,255,0.04);
+  --card-shadow: 0 6px 18px rgba(0,0,0,0.35);
+
+  color: var(--text);
+  background-color: var(--bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,11 +34,15 @@ a:hover {
 }
 
 body {
+body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center; /* centra horizontalmente el .App */
+  align-items: flex-start; /* mantener desde arriba */
 }
 
 h1 {
@@ -36,22 +51,156 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
-  background-color: #f9f9f9;
+  background-color: var(--button-bg);
+  color: var(--button-text);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 button:hover {
-  border-color: #213547;
+  transform: translateY(-1px);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 3px solid rgba(56,189,248,0.18);
+  outline-offset: 2px;
+}
+
+/* Inputs and table styling */
+input, textarea, select {
+  background-color: var(--input-bg);
+  color: var(--muted);
+  border: 1px solid var(--input-border);
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+}
+table {
+  background-color: transparent;
+  color: var(--muted);
+  width: 100%;
+}
+
+/* Card style */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border-radius: 8px;
+  border: none;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+.btn-primary.small { padding: 4px 8px; border-radius: 6px; }
+.btn-danger {
+  background: #FA8787;
+  color: var(--button-text);
+  border-radius: 8px;
+  border: none;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+.btn-danger.small { padding: 4px 8px; border-radius: 6px; }
+
+/* Tables */
+.tbl-th {
+  border-bottom: 2px solid rgba(255,255,255,0.06);
+  padding: 8px;
+  text-align: left;
+  color: var(--text);
+}
+.tbl-td {
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  padding: 8px;
+  color: var(--muted);
+}
+.tbl-td.center { text-align: center; }
+.tbl-row.even { background: rgba(255,255,255,0.01); }
+.tbl-row.odd { background: transparent; }
+
+/* Utility */
+.muted { color: var(--muted); }
+
+/* Navigation buttons */
+.nav-btn {
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  margin-right: 6px;
+}
+.nav-btn.active {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border-color: transparent;
+}
+
+/* Title styling */
+.app-title {
+  font-size: 2.2rem;
+  letter-spacing: 3px;
+  color: #60a5fa; /* celeste más agradable */
+  margin: 0;
+}
+
+/* Ensure main containers center content by default */
+.App > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Center the app within the page reliably */
+.App {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Main content container: center and constrain width */
+.main-content {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Ensure navigation centers its buttons */
+nav[style], nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* Hover effects for buttons and table rows */
+button:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.95;
+}
+
+.tbl-row:hover {
+  background-color: rgba(96, 165, 250, 0.06);
+  transition: background 0.2s ease;
 }
 
 /* Removed dark-mode media query: app will use the light theme by default */

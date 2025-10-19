@@ -90,10 +90,10 @@ function Informes() {
           </select>
         </div>
         <div>
-          <button onClick={handlePreview} style={{ color: '#213547', background: '#C2FAFF', border: 'none', borderRadius: 6, padding: '6px 10px', cursor: 'pointer' }}>{loading ? 'Cargando...' : 'Previsualizar'}</button>
+          <button onClick={handlePreview} className="btn-primary" style={{ borderRadius: 6 }}>{loading ? 'Cargando...' : 'Previsualizar'}</button>
         </div>
         <div>
-          <button onClick={handleDownload} style={{ color: '#213547', background: '#C2FAFF', border: 'none', borderRadius: 6, padding: '6px 10px', cursor: 'pointer' }}>Descargar CSV</button>
+          <button onClick={handleDownload} className="btn-primary" style={{ borderRadius: 6 }}>Descargar CSV</button>
         </div>
       </div>
 

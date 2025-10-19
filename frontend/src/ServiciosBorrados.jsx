@@ -67,7 +67,7 @@ function ServiciosBorrados() {
                 <td style={{ border: "1px solid #b3e0fc", padding: "8px", textAlign: "center" }}>{s.fechaIngreso}</td>
                 <td style={{ border: "1px solid #b3e0fc", padding: "8px", textAlign: "center" }}>{s.fechaEntrega || "-"}</td>
                 <td style={{ border: "1px solid #b3e0fc", padding: "8px", textAlign: "center" }}>
-                  <button onClick={() => handleDelete(s.id_borrado)} style={{ color: '#213547', background: '#FA8787', border: 'none', borderRadius: 4, padding: '4px 10px', cursor: 'pointer' }}>Eliminar</button>
+                  <button onClick={() => handleDelete(s.id_borrado)} className="btn-danger small">Eliminar</button>
                 </td>
               </tr>
             ))}

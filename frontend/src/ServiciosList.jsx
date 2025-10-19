@@ -107,7 +107,7 @@ function ServiciosList() {
           <label>Fecha de ingreso: </label>
           <input type="date" name="fechaIngreso" value={form.fechaIngreso} onChange={handleChange} required />
         </div>
-        <button type="submit" disabled={enviando} style={{ marginTop: 10, color: '#213547', background: '#C2FAFF', border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer' }}>
+        <button type="submit" disabled={enviando} className="btn-primary" style={{ marginTop: 10 }}>
           {enviando ? "Registrando..." : "Registrar servicio"}
         </button>
         {formError && <p style={{ color: "red" }}>{formError}</p>}
@@ -120,27 +120,27 @@ function ServiciosList() {
         <table style={{ borderCollapse: "collapse", width: "100%" }}>
           <thead>
             <tr>
-              <th style={{ border: "1px solid #b3e0fc", borderBottom: "2px solid #2196f3", color: "#000", padding: "8px" }}>ID</th>
-              <th style={{ border: "1px solid #b3e0fc", borderBottom: "2px solid #2196f3", color: "#000", padding: "8px" }}>Tipo</th>
-              <th style={{ border: "1px solid #b3e0fc", borderBottom: "2px solid #2196f3", color: "#000", padding: "8px" }}>Descripción</th>
-              <th style={{ border: "1px solid #b3e0fc", borderBottom: "2px solid #2196f3", color: "#000", padding: "8px" }}>Estado</th>
-              <th style={{ border: "1px solid #b3e0fc", borderBottom: "2px solid #2196f3", color: "#000", padding: "8px" }}>Fecha Ingreso</th>
-              <th style={{ border: "1px solid #b3e0fc", borderBottom: "2px solid #2196f3", color: "#000", padding: "8px" }}>Fecha Entrega</th>
-              <th style={{ border: "1px solid #b3e0fc", borderBottom: "2px solid #2196f3", color: "#000", padding: "8px" }}>Acciones</th>
+              <th className="tbl-th">ID</th>
+              <th className="tbl-th">Tipo</th>
+              <th className="tbl-th">Descripción</th>
+              <th className="tbl-th">Estado</th>
+              <th className="tbl-th">Fecha Ingreso</th>
+              <th className="tbl-th">Fecha Entrega</th>
+              <th className="tbl-th">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {servicios.map((s, idx) => (
-              <tr key={s.id} style={{ borderBottom: "1px solid #b3e0fc", background: idx % 2 === 0 ? "#f8fbfd" : "#fff" }}>
-                <td style={{ border: "1px solid #b3e0fc", padding: "8px", textAlign: "center" }}>{s.id}</td>
-                <td style={{ border: "1px solid #b3e0fc", padding: "8px" }}>{s.tipo}</td>
-                <td style={{ border: "1px solid #b3e0fc", padding: "8px" }}>{s.descripcion}</td>
-                <td style={{ border: "1px solid #b3e0fc", padding: "8px", textAlign: "center" }}>{s.estado}</td>
-                <td style={{ border: "1px solid #b3e0fc", padding: "8px", textAlign: "center" }}>{s.fechaIngreso}</td>
-                <td style={{ border: "1px solid #b3e0fc", padding: "8px", textAlign: "center" }}>{s.fechaEntrega || "-"}</td>
-                <td style={{ border: "1px solid #b3e0fc", padding: "8px", textAlign: "center", display: 'flex', gap: 8, justifyContent: 'center' }}>
-                  <button onClick={() => handleMoveToPaper(s.id, 'terminado')} style={{ color: '#213547', background: '#C2FAFF', border: 'none', borderRadius: 4, padding: '4px 10px', cursor: 'pointer' }}>Terminado</button>
-                  <button onClick={() => handleMoveToPaper(s.id, 'cancelado')} style={{ color: '#213547', background: '#FA8787', border: 'none', borderRadius: 4, padding: '4px 10px', cursor: 'pointer' }}>Cancelado</button>
+              <tr key={s.id} className={`tbl-row ${idx % 2 === 0 ? 'even' : 'odd'}`}>
+                <td className="tbl-td center">{s.id}</td>
+                <td className="tbl-td">{s.tipo}</td>
+                <td className="tbl-td">{s.descripcion}</td>
+                <td className="tbl-td center">{s.estado}</td>
+                <td className="tbl-td center">{s.fechaIngreso}</td>
+                <td className="tbl-td center">{s.fechaEntrega || "-"}</td>
+                <td className="tbl-td center" style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                  <button onClick={() => handleMoveToPaper(s.id, 'terminado')} className="btn-primary small">Terminado</button>
+                  <button onClick={() => handleMoveToPaper(s.id, 'cancelado')} className="btn-danger small">Cancelado</button>
                 </td>
               </tr>
             ))}

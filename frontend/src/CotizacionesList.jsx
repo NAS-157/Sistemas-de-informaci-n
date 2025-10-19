@@ -62,8 +62,8 @@ function CotizacionesList() {
                 <td style={{ padding: 8 }}>${c.total}</td>
                 <td style={{ padding: 8 }}>{c.fecha}</td>
                 <td style={{ padding: 8 }}>
-                  <button onClick={() => cambiarEstado(c.id, 'aceptada')} style={{ marginRight: 6, color: '#213547', background: '#C2FAFF', border: 'none', borderRadius: 4, padding: '4px 8px', cursor: 'pointer' }}>Aceptar</button>
-                  <button onClick={() => cambiarEstado(c.id, 'rechazada')} style={{ color: '#213547', background: '#FA8787', border: 'none', borderRadius: 4, padding: '4px 8px', cursor: 'pointer' }}>Rechazar</button>
+                  <button onClick={() => cambiarEstado(c.id, 'aceptada')} className="btn-primary small" style={{ marginRight: 6 }}>Aceptar</button>
+                  <button onClick={() => cambiarEstado(c.id, 'rechazada')} className="btn-danger small">Rechazar</button>
                 </td>
               </tr>
             ))}
@@ -100,7 +100,7 @@ function CotizacionesList() {
                   <button onClick={() => {
                     if (!window.confirm('¿Eliminar esta cotización aceptada? Esto la moverá a la papelera.')) return;
                     cambiarEstado(c.id, 'rechazada');
-                  }} style={{ color: '#213547', background: '#FA8787', border: 'none', borderRadius: 4, padding: '4px 8px', cursor: 'pointer' }}>Eliminar</button>
+                  }} className="btn-danger small">Eliminar</button>
                 </td>
               </tr>
             ))}

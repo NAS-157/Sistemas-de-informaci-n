@@ -60,10 +60,10 @@ function CotizacionForm({ onCreated }) {
           <div key={idx} style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
             <input placeholder="Descripción" value={it.descripcion} onChange={e => handleItemChange(idx, 'descripcion', e.target.value)} required />
             <input placeholder="Precio" type="number" value={it.precio} onChange={e => handleItemChange(idx, 'precio', e.target.value)} required />
-            <button type="button" onClick={() => removeItem(idx)} style={{ color: '#213547', background: '#FA8787', border: 'none', borderRadius: 4, padding: '4px 8px', cursor: 'pointer' }}>Quitar</button>
+            <button type="button" onClick={() => removeItem(idx)} className="btn-danger small">Quitar</button>
           </div>
         ))}
-  <button type="button" onClick={addItem} style={{ color: '#213547', background: '#C2FAFF', border: 'none', borderRadius: 4, padding: '6px 10px', cursor: 'pointer' }}>Agregar item</button>
+  <button type="button" onClick={addItem} className="btn-primary small">Agregar item</button>
       </div>
 
       <div style={{ marginTop: 10 }}>
@@ -71,7 +71,7 @@ function CotizacionForm({ onCreated }) {
       </div>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
-  <button type="submit" disabled={enviando} style={{ marginTop: 8, color: '#213547', background: '#C2FAFF', border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer' }}>{enviando ? 'Guardando...' : 'Crear cotización'}</button>
+  <button type="submit" disabled={enviando} className="btn-primary" style={{ marginTop: 8 }}>{enviando ? 'Guardando...' : 'Crear cotización'}</button>
     </form>
   );
 }

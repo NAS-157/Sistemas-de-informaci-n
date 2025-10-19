@@ -53,7 +53,7 @@ function CotizacionesBorradas() {
                 </td>
                 <td style={{ padding: 8 }}>${c.total}</td>
                 <td style={{ padding: 8 }}>{c.fecha}</td>
-                <td style={{ padding: 8 }}><button onClick={() => handleDelete(c.id_borrado)} style={{ color: '#213547', background: '#FA8787', border: 'none', borderRadius: 4, padding: '4px 8px', cursor: 'pointer' }}>Eliminar</button></td>
+                <td style={{ padding: 8 }}><button onClick={() => handleDelete(c.id_borrado)} className="btn-danger small">Eliminar</button></td>
               </tr>
             ))}
           </tbody>

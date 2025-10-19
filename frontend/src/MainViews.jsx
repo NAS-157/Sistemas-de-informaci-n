@@ -11,7 +11,7 @@ function MainViews() {
   const [view, setView] = useState('cotizaciones');
 
   return (
-    <div style={{ width: '100%' }}>
+    <div className="main-content">
       <Navigation current={view} onChange={setView} />
 
       {view === 'cotizaciones' && (

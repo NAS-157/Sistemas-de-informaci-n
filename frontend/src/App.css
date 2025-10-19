@@ -18,27 +18,6 @@
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-/* Variables de tema: claro por defecto, .dark sobrescribe */
-:root {
-  --bg: #ffffff;
-  --accent: #2196f3; /* celeste */
-  --accent-light: #b3e0fc;
-  --text: #2196f3; /* texto en modo claro sigue siendo celeste como antes */
-  --on-accent: #ffffff;
-  --row-odd: #f8fbfd;
-  --row-even: #ffffff;
-}
-
-.dark {
-  --bg: #000000;
-  --accent: #ff9800; /* naranja en modo oscuro */
-  --accent-light: #ffb74d;
-  --text: #ffffff; /* las letras se mantienen blancas en modo oscuro */
-  --on-accent: #ffffff;
-  --row-odd: #0b0b0b;
-  --row-even: #000000;
-}
-
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -56,6 +35,11 @@
 
 .card {
   padding: 2em;
+  background-color: rgba(255,255,255,0.04);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  margin-bottom: 1rem;
 }
 
 .read-the-docs {
